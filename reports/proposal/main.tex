@@ -38,13 +38,32 @@ A similar idea holds for tightening the final expression $A\varepsilon$, instead
 
 Note that in both cases, we can slightly improve the bounds by only considering the $k^2$-sized subsets of elements of $A$ that make a square centered at some center $O$ of the image. In particular, we need only consider $|I|$ collections of $k^2$ elements, and take the largest sum of absolute values. This is in fact only a constant factor slower than the original LiRPA algorithm.
 
-Finally, notice that we must ensure that our tighter bounds remain differentiable w.r.t the matrix $A$, so that we can use gradient-based optimization to find the optimal $\alpha$s. Note that the $\texttt{min}$ and $\texttt{max}$ functions are [[@Yash - are these supported by PyTorch? please check.]]
+Finally, notice that we must ensure that our tighter bounds remain differentiable w.r.t the matrix $A$, so that we can use gradient-based optimization to find the optimal $\alpha$s. 
 
+
+\newpage
 \section{Implementing the proposed approach}
 
-[[@Yash - could you please draft this section?]]
+Implementing the proposed solution would require changes in two places: the complete-verifier of the alpha-beta crown tool and the autolirpa tool.
 
-\section{Timeline}
+Files in Alpha-beta Crown Tool - 
 
-[[@Yash - should we mention this?]]
+\begin{itemize}
+    \item beta\_crown\_solver.py - input output has to be tweaked a little to allow the optimization of the changed final function
+    \item abcrown.py - has to be changed to consider the new perturbation format.
+\end{itemize}
+
+Files in AutoLirpa - 
+
+\begin{itemize}
+    \item perturbation.py - to perform the special perturbation
+    \item backward\_bound.py, forward\_bound.py, bound\_general.py, and bound\_ops.py must be changed to calculate the right bounds on the new objective function.
+\end{itemize}
+
+This list is not exhaustive. These are found after the first inspection. In due progress of the project we might
+end up modifying other files as well.
+
+
+
+
 \end{document}
