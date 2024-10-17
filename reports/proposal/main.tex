@@ -3,10 +3,18 @@
 \usepackage{amsmath,amssymb,bm}
 \usepackage{hyperref}
 
+\title{CS 781: Formal Methods in Machine Learning\\Project Proposal}
+\author{Yash Jonjale (22B0990)\\Krishna N Agaram (210051003)}
+\date{October 17, 2024}
+\usepackage[left=30mm,right=30mm,top=10mm,bottom=20mm]{geometry}
+% \pagenumbering{gobble}
+
 \begin{document}
+\maketitle
+\tableofcontents
 \section{Proposal}\label{sec:proposal}
 
-Image recognition is invaluable for interaction with computers; human-like robustness of recognition to small perturbations in the input, however, is still a concern. Oftentimes, the perturbation is due to a mistake in the image collection, e.g. a cat with a tree branch covering its face, or a number 8 with a small ink blot. In this project, we propose to investigate the \emph{verification} of robustness of image recognition models to such \emph{locally spatial} perturbations. In particular, we consider the following \emph{spatially-local} perturbation model to image $I$ parameterized by integer $k$ and real number $\epsilon$: an arbitrary center of perturbation $O$ is chosen within the image, and a square of side length $k$ pixels centred at $O$ is perturbed by adding a random noise of magnitude at most $\epsilon$ in $\mathcal L^p$ norm. We aim to develop a method to verify, given a model, the robustness to such perturbations when only $k$ and $\epsilon$ (not the center $O$) are known. Our method will build on the state-of-the-art \texttt{auto\_LirPA} codebase, finetuning approximations and inequalities to the locally spatial perturbation model. Finally, time permitting, we will evaluate the method on a variety of standard image recognition models and popular datasets.
+Image recognition is invaluable for interaction with computers; human-like robustness of recognition to small perturbations in the input, however, is still a concern. Oftentimes, the perturbation is due to a mistake in the image collection, e.g. a cat with a tree branch covering its face, or the number 8 with a small ink blot. In this project, we propose to investigate the \emph{verification} of robustness of image recognition models to such \emph{locally spatial} perturbations. In particular, we consider the following \emph{spatially-local} perturbation model to image $I$ parameterized by integer $k$ and real number $\epsilon$: an arbitrary center of perturbation $O$ is chosen within the image, and a square of side length $k$ pixels centred at $O$ is perturbed by adding a random noise of magnitude at most $\epsilon$ in $\mathcal L^p$ norm. We aim to develop a method to verify, given a model, the robustness to such perturbations when only $k$ and $\epsilon$ (not the center $O$) are known. Our method will build on the state-of-the-art \texttt{auto\_LirPA} codebase, finetuning approximations and inequalities to the locally spatial perturbation model. Finally, time permitting, we will evaluate the method on a variety of standard image recognition models and popular datasets.
 
 \section{Challenges}\label{sec:challenges}
 
@@ -15,9 +23,9 @@ A non-exhaustive list of challenges that we anticipate follow.
 \begin{itemize}
     \item The key challenge. It is trivial, of course, to simply try every possible center $O$ and verify robustness to the perturbation. However, this yields a quadratic (in image dimensions) blow-up, which is not feasible - even for $100\times 100$-sized images and $30s$ per LiRPA verification, this takes $24$ hours. The challenge is to \textbf{consider all centers simultaneously during verification, with little loss below the worst-case center}.
     \item The only approximate quantities in CROWN are the bounds on the ReLU outputs. Our challenge, then, is to \textbf{tighten the ReLU bounds for the particular perturbation model}.
-    \item The last step in the LiRPA process is to bound the quantity $A\bm \varepsilon$ with $x$ being the perturbation applied to the image. CROWN uses Hölder's inequality; we will need to \textbf{find tighter bounds given the spatial perturbation model}. Actually, this is not sufficient: we also need to make our bounds \emph{differentiable} with respect to the matrix $A$ (and hence the $\alpha$s).
-    \item These were the theoretical concerns; the devil is in the implementation details. We need to \emph{find and replace the old bounds with tighter versions, making sure the tighter bounds are efficiently computable}. We aim for only a constant-factor slowdown in the verification process.
-    \item Finally, it would be nice to be able, if the verification fails, to be able to \emph{find a center $O$ whose perturbation fails to be recognized}. We intend to try this, time permitting.
+    \item The last step in the LiRPA process is to bound the quantity $A\bm \varepsilon$ with $x$ being the perturbation applied to the image. CROWN uses Hölder's inequality; we will need to \textbf{find tighter bounds given the spatial perturbation model}. Actually, this is not sufficient: we also need to make our bounds \textbf{differentiable} with respect to the matrix $A$ (and hence the $\alpha$s).
+    \item These were the theoretical concerns; the devil is in the implementation details. We need to \textbf{find and replace the old bounds with tighter versions, making sure the tighter bounds are efficiently computable}. We aim for only a constant-factor slowdown in the verification process.
+    \item Finally, it would be nice to be able, if the verification fails, to be able to \textbf{find a center $O$ whose perturbation fails to be recognized}. We intend to try this, time permitting.
 \end{itemize}
 
 Possible solutions to these challenges are discussed in Section \ref{sec:approach}.
@@ -40,30 +48,24 @@ Note that in both cases, we can slightly improve the bounds by only considering 
 
 Finally, notice that we must ensure that our tighter bounds remain differentiable w.r.t the matrix $A$, so that we can use gradient-based optimization to find the optimal $\alpha$s. 
 
-
-\newpage
 \section{Implementing the proposed approach}
 
 Implementing the proposed solution would require changes in two places: the complete-verifier of the alpha-beta crown tool and the autolirpa tool.
 
-Files in Alpha-beta Crown Tool - 
+Files in the $\alpha,\beta$-CROWN tool:
 
 \begin{itemize}
     \item beta\_crown\_solver.py - input output has to be tweaked a little to allow the optimization of the changed final function
     \item abcrown.py - has to be changed to consider the new perturbation format.
 \end{itemize}
 
-Files in AutoLirpa - 
+Files in the \texttt{auto\_LiRPA} tool:
 
 \begin{itemize}
-    \item perturbation.py - to perform the special perturbation
+    \item perturbation.py - to encode the new perturbation model.
     \item backward\_bound.py, forward\_bound.py, bound\_general.py, and bound\_ops.py must be changed to calculate the right bounds on the new objective function.
 \end{itemize}
 
-This list is not exhaustive. These are found after the first inspection. In due progress of the project we might
-end up modifying other files as well.
-
-
-
+This list is not exhaustive. These are simply those found after a first inspection. In due progress of the project we might end up modifying other files as well.
 
 \end{document}

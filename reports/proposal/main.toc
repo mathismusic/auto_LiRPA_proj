@@ -1,0 +1,5 @@
+\contentsline {section}{\numberline {1}Proposal}{1}{section.1}%
+\contentsline {section}{\numberline {2}Challenges}{1}{section.2}%
+\contentsline {section}{\numberline {3}Tools and Codebase}{2}{section.3}%
+\contentsline {section}{\numberline {4}Approach}{2}{section.4}%
+\contentsline {section}{\numberline {5}Implementing the proposed approach}{2}{section.5}%
